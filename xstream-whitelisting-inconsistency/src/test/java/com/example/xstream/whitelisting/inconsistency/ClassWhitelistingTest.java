@@ -22,31 +22,32 @@ public class ClassWhitelistingTest
         //xstream.alias("ImageParameters", ImageParameters.class);
         return xstream;
     }
-    
-    private static ImageParameters createImageParameters() {
+
+    private static ImageParameters createImageParameters()
+    {
         ImageParameters imageParameters = new ImageParameters();
-        imageParameters.setImage(new byte[] {0, 1, 2, 3, 4, 5, 6}); // not really an image, just for testing
+        imageParameters.setImage(new byte[]{0, 1, 2, 3, 4, 5, 6}); // not really an image, just for testing
         imageParameters.setX(10);
         imageParameters.setY(20);
-        
-		TextParameters textParameters = new TextParameters();
-		textParameters.setText("Some text...\r\nSome more text...");
-		textParameters.setTextColor(Color.BLACK);
+
+        TextParameters textParameters = new TextParameters();
+        textParameters.setText("Some text...\r\nSome more text...");
+        textParameters.setTextColor(Color.BLACK);
         textParameters.setFont(new Font("Arial", Font.PLAIN, 8));
-		imageParameters.setTextParameters(textParameters);
-        
+        imageParameters.setTextParameters(textParameters);
+
         return imageParameters;
     }
-    
+
     private static XStream createXstreamDeserializerForImageParameters()
     {
         XStream xstream = createBaseWhitelistingDeserializer();
-        
+
         //xstream.alias("ImageParameters", ImageParameters.class);
         // Note: for some reasons Font and Color do not need to be mentioned, even though they are used (is that due to default ColorConverter and FontConverter?)
         // Note: for some reasons ImageTextParameters needs not to be mentioned either. However, without String it fails.
-        xstream.allowTypes(new Class[]{ImageParameters.class /*String.class, byte[].class, TextParameters.class, Color.class, Font.class*/ });
-        
+        xstream.allowTypes(new Class[]{ImageParameters.class /*String.class, byte[].class, TextParameters.class, Color.class, Font.class*/});
+
         return xstream;
     }
 
@@ -62,8 +63,8 @@ public class ClassWhitelistingTest
         return xstream;
     }
 
-        // deserialization will fail because String.class was not whitelisted which is used by TextParameters with (but it only happens if Font needs to be deserialized, not when just String needs to be deserialized):
-        /*
+    // deserialization will fail because String.class was not whitelisted which is used by TextParameters with (but it only happens if Font needs to be deserialized, not when just String needs to be deserialized):
+    /*
 testDeserializationWithoutStringInAllowTypes(com.example.xstream.whitelisting.inconsistency.ClassWhitelistingTest)  Time elapsed: 0.266 sec  <<< ERROR!
 com.thoughtworks.xstream.converters.ConversionException: java.lang.String : java.lang.String
 ---- Debugging information ----
@@ -103,7 +104,7 @@ version             : 1.4.7
 	at com.thoughtworks.xstream.XStream.fromXML(XStream.java:1040)
 	at com.thoughtworks.xstream.XStream.fromXML(XStream.java:1031)
 	at com.example.xstream.whitelisting.inconsistency.ClassWhitelistingTest.testDeserializationWithoutStringInAllowTypes(ClassWhitelistingTest.java:82)
-        */
+     */
     @Test
     public void testDeserializationWithoutStringInAllowTypes()
     {
@@ -111,27 +112,27 @@ version             : 1.4.7
         String imageParametersSerialized = XSTREAM.toXML(imageParameters);
 
         XStream xstream = createXstreamDeserializerForImageParameters();
-        ImageParameters imageParametersDeserialized = (ImageParameters)xstream.fromXML(imageParametersSerialized);
+        ImageParameters imageParametersDeserialized = (ImageParameters) xstream.fromXML(imageParametersSerialized);
         Assert.assertNotNull(imageParametersDeserialized);
     }
-    
-    
+
+
     // passes, even though some of the types are not mentioned
     @Test
     public void testDeserializationWithStringInAllowTypes()
     {
         ImageParameters imageParameters = createImageParameters();
         String imageParametersSerialized = XSTREAM.toXML(imageParameters);
-        
+
         XStream xstream = createBaseWhitelistingDeserializer();
         //xstream.alias("ImageParameters", ImageParameters.class);
         // Note: for some reasons Font and Color do not need to be mentioned, even though they are used (is that due to default ColorConverter and FontConverter?)
         // Note: for some reasons ImageTextParameters needs not to be mentioned either.
         xstream.allowTypes(new Class[]{String.class, /*byte[].class,*/ ImageParameters.class/*, TextParameters.class, Color.class, Font.class*/});
-        ImageParameters imageParametersDeserialized = (ImageParameters)xstream.fromXML(imageParametersSerialized);
+        ImageParameters imageParametersDeserialized = (ImageParameters) xstream.fromXML(imageParametersSerialized);
         Assert.assertNotNull(imageParametersDeserialized);
     }
-    
+
     // OK, String is not a problem when used in a custom class
     @Test
     public void testDeserializationWithoutStringInAllowTypesButNoFont()
@@ -139,42 +140,42 @@ version             : 1.4.7
         StringWrapper stringWrapper = new StringWrapper();
         stringWrapper.setStringValue("Test");
         String stringWrapperSerialized = XSTREAM.toXML(stringWrapper);
-        
+
         XStream xstream = createBaseWhitelistingDeserializer();
         xstream.allowTypes(new Class[]{StringWrapper.class});
-        StringWrapper stringWrapperDeserialized = (StringWrapper)xstream.fromXML(stringWrapperSerialized);
+        StringWrapper stringWrapperDeserialized = (StringWrapper) xstream.fromXML(stringWrapperSerialized);
         Assert.assertNotNull(stringWrapperDeserialized);
         Assert.assertEquals("Test", stringWrapper.getStringValue());
     }
-    
+
     // fails, String is not whitelisted
     @Test
     public void testFontDeserializationWithoutStringInAllowTypes()
     {
         Font font = new Font("Arial", Font.PLAIN, 8);
         String fontSerialized = XSTREAM.toXML(font);
-        
+
         XStream xstream = createBaseWhitelistingDeserializer();
         xstream.allowTypes(new Class[]{Font.class});
-        Font fontDeserialized = (Font)xstream.fromXML(fontSerialized);
-        
+        Font fontDeserialized = (Font) xstream.fromXML(fontSerialized);
+
         Assert.assertNotNull(fontDeserialized);
         Assert.assertEquals("Arial", fontDeserialized.getFontName());
         Assert.assertEquals(Font.PLAIN, fontDeserialized.getStyle());
         Assert.assertEquals(8, fontDeserialized.getSize());
     }
-    
+
     // font deserialization succeeds only when String whitelisted
     @Test
     public void testFontDeserializationWithStringInAllowTypes()
     {
         Font font = new Font("Arial", Font.PLAIN, 8);
         String fontSerialized = XSTREAM.toXML(font);
-        
+
         XStream xstream = createBaseWhitelistingDeserializer();
         xstream.allowTypes(new Class[]{String.class, Font.class});
-        Font fontDeserialized = (Font)xstream.fromXML(fontSerialized);
-        
+        Font fontDeserialized = (Font) xstream.fromXML(fontSerialized);
+
         Assert.assertNotNull(fontDeserialized);
         Assert.assertEquals("Arial", fontDeserialized.getFontName());
         Assert.assertEquals(Font.PLAIN, fontDeserialized.getStyle());

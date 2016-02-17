@@ -1,18 +1,21 @@
 package com.example.xstream.whitelisting.inconsistency;
 
-public class ImageParameters {
-	private byte[] image;
-	private float x;
-	private float y;
-	private TextParameters textParameters;
+public class ImageParameters
+{
+    private byte[] image;
+    private float x;
+    private float y;
+    private TextParameters textParameters;
 
-	public byte[] getImage() {
-		return image;
-	}
+    public byte[] getImage()
+    {
+        return image;
+    }
 
-	public void setImage(byte[] image) {
-		this.image = image;
-	}
+    public void setImage(byte[] image)
+    {
+        this.image = image;
+    }
 
     public float getX()
     {
@@ -33,12 +36,14 @@ public class ImageParameters {
     {
         this.y = y;
     }
-    
-	public TextParameters getTextParameters() {
-		return textParameters;
-	}
 
-	public void setTextParameters(TextParameters textParameters) {
-		this.textParameters = textParameters;
-	}
+    public TextParameters getTextParameters()
+    {
+        return textParameters;
+    }
+
+    public void setTextParameters(TextParameters textParameters)
+    {
+        this.textParameters = textParameters;
+    }
 }
